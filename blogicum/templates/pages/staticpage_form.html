@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}
+    {% if page %}Редактирование {{ page.title }}{% else %}Создание страницы{% endif %}
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    {% if page %}Редактирование страницы{% else %}Создание страницы{% endif %}
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if page %}Сохранить{% else %}Создать{% endif %}
+                            </button>
+                            <a href="{% if page %}{% url 'pages:staticpage_detail' page.slug %}{% else %}{% url 'pages:staticpage_list' %}{% endif %}" 
+                               class="btn btn-secondary">Отмена</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

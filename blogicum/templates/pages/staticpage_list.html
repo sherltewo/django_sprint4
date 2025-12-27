@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Статичные страницы{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Статичные страницы</h1>
+    {% if user.is_staff %}
+    <a href="{% url 'pages:staticpage_create' %}" class="btn btn-primary mb-3">Создать страницу</a>
+    {% endif %}
+    
+    <div class="list-group">
+        {% for page in pages %}
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5><a href="{% url 'pages:staticpage_detail' page.slug %}">{{ page.title }}</a></h5>
+                    <p class="text-muted">Создано: {{ page.created_at|date:"d E Y" }}</p>
+                </div>
+                {% if user.is_staff %}
+                <div>
+                    <a href="{% url 'pages:staticpage_edit' page.slug %}" class="btn btn-sm btn-outline-primary me-1">Редактировать</a>
+                    <a href="{% url 'pages:staticpage_delete' page.slug %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p>Пока нет статичных страниц.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

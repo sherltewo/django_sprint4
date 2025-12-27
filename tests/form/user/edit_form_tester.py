@@ -1,5 +1,5 @@
 from typing import Tuple, Union
-
+from django.contrib.auth.forms import UserChangeForm
 import bs4
 from django.db.models import QuerySet, Model
 from django.forms import BaseForm
@@ -25,7 +25,7 @@ from form.base_form_tester import (
 )
 
 
-class EditUserFormTester(BaseFormTester):
+class EditUserFormTester(BaseFormTester): 
     def __init__(
         self,
         response: HttpResponse,
