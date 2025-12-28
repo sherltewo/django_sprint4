@@ -9,6 +9,14 @@ class PostQuerySet(models.QuerySet):
     def with_comments_count(self):
         """Добавляет количество комментариев к каждому посту в QuerySet"""
         return self.annotate(comment_count=Count('comments'))
+    
+    def published(self):
+        """Только опубликованные посты"""
+        return self.filter(
+            is_published=True,
+            pub_date__lte=timezone.now(),
+            category__is_published=True
+        )
 
 
 class Category (models.Model):

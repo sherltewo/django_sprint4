@@ -12,19 +12,30 @@ class PostForm(forms.ModelForm):
         help_text='Установите дату в будущем для отложенной публикации'
     )
 
+    is_published = forms.BooleanField(
+        label='Опубликовано',
+        required=False,
+        initial=True,
+        help_text='Снимите галочку, чтобы скрыть публикацию.'
+    )
+
+    
+
     class Meta:
         model = Post
-        fields = ['title', 'text', 'category', 'location', 'image', 'pub_date']
+        fields = ['title', 'text', 'category', 'location', 'image', 'pub_date', 'is_published']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'location': forms.Select(attrs={'class': 'form-control'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'is_published': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         help_texts = {
             'category': 'Выберите существующую категорию',
             'location': 'Выберите местоположение (необязательно)',
+            'is_published': 'Снимите галочку, чтобы скрыть публикацию.',
         }
 
     def __init__(self, *args, **kwargs):

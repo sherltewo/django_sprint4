@@ -20,13 +20,20 @@ from django.http import Http404, HttpResponseForbidden
 from django.contrib.auth.forms import UserChangeForm
 
 
+def get_page_obj(queryset, request, per_page=10):
+    """Создает объект страницы для пагинации"""
+    paginator = Paginator(queryset, per_page)
+    page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
+
+
 def index(request):
     """Главная страница со списком постов"""
     post_list = Post.objects.filter(
         is_published=True,
         pub_date__lte=timezone.now(),
         category__is_published=True
-    ).annotate(
+    ).with_comments_count(
         comment_count=Count('comments')
     ).order_by('-pub_date')
 
@@ -88,7 +95,7 @@ def category_posts(request, category_slug):
         category=category,
         is_published=True,
         pub_date__lte=timezone.now()
-    ).annotate(
+    ).with_comments_count(
         comment_count=Count('comments')
     ).order_by('-pub_date')
 
@@ -108,7 +115,7 @@ def user_posts(request, username):
     user = get_object_or_404(User, username=username)
 
     if request.user == user:
-        posts = Post.objects.filter(author=user).annotate(
+        posts = Post.objects.filter(author=user).with_comments_count(
             comment_count=Count('comments')
         ).order_by('-pub_date')
     else:
@@ -117,7 +124,7 @@ def user_posts(request, username):
             is_published=True,
             pub_date__lte=timezone.now(),
             category__is_published=True
-        ).annotate(
+        ).with_comments_count(
             comment_count=Count('comments')
         ).order_by('-pub_date')
 
@@ -141,7 +148,7 @@ def post_create(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.is_published = True
+            #post.is_published = True
             post.save()
 
             send_post_created_email(request.user, post)
