@@ -1,5 +1,14 @@
 from django.db import models
+from django.db.models import Count
 from django.contrib.auth import get_user_model
+
+
+class PostQuerySet(models.QuerySet):
+    """Кастомный QuerySet для модели Post"""
+    
+    def with_comments_count(self):
+        """Добавляет количество комментариев к каждому посту в QuerySet"""
+        return self.annotate(comment_count=Count('comments'))
 
 
 class Category (models.Model):
@@ -127,6 +136,8 @@ class Post(models.Model):
         verbose_name='Изображение публикации',
         help_text='Добавьте изображение к публикации'
     )
+
+    objects = PostQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'публикация'
