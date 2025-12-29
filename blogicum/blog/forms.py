@@ -12,18 +12,10 @@ class PostForm(forms.ModelForm):
         help_text='Установите дату в будущем для отложенной публикации'
     )
 
-    is_published = forms.BooleanField(
-        label='Опубликовано',
-        required=False,
-        initial=True,
-        help_text='Снимите галочку, чтобы скрыть публикацию.'
-    )
-
-    
 
     class Meta:
         model = Post
-        fields = ['title', 'text', 'category', 'location', 'image', 'pub_date', 'is_published']
+        exclude = ['author', 'created_at']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),

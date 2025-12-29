@@ -1,10 +1,30 @@
 from django.db import models
 from django.db.models import Count
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 
 class PostQuerySet(models.QuerySet):
     """Кастомный QuerySet для модели Post"""
+
+    def with_comments_and_filter(self, only_published=True):
+        """
+        Объединяет фильтрацию по опубликованности и добавление количества комментариев.
+        
+        Аргументы:
+            only_published (bool): Если True - фильтрует только опубликованные посты.
+                                  Если False - возвращает все посты (для автора).
+        """
+        queryset = self
+        
+        if only_published:
+            queryset = queryset.filter(
+                is_published=True,
+                pub_date__lte=timezone.now(),
+                category__is_published=True
+            )
+        
+        return queryset.annotate(comment_count=Count('comments'))
     
     def with_comments_count(self):
         """Добавляет количество комментариев к каждому посту в QuerySet"""
@@ -150,6 +170,8 @@ class Post(models.Model):
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
+
+    ordering = ['-pub_date']
 
     def __str__(self):
         return self.title

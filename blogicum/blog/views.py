@@ -33,9 +33,7 @@ def index(request):
         is_published=True,
         pub_date__lte=timezone.now(),
         category__is_published=True
-    ).with_comments_count(
-        comment_count=Count('comments')
-    ).order_by('-pub_date')
+    ).with_comments_count().order_by('-pub_date')
 
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
@@ -55,7 +53,7 @@ def post_detail(request, id):
         id=id
     )
 
-    is_author = request.user == post.author
+    is_author = request.user.is_authenticated and request.user == post.author
     is_published = (
         post.is_published
         and post.pub_date <= timezone.now()
@@ -95,9 +93,7 @@ def category_posts(request, category_slug):
         category=category,
         is_published=True,
         pub_date__lte=timezone.now()
-    ).with_comments_count(
-        comment_count=Count('comments')
-    ).order_by('-pub_date')
+    ).with_comments_count().order_by('-pub_date')
 
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
@@ -115,18 +111,14 @@ def user_posts(request, username):
     user = get_object_or_404(User, username=username)
 
     if request.user == user:
-        posts = Post.objects.filter(author=user).with_comments_count(
-            comment_count=Count('comments')
-        ).order_by('-pub_date')
+        posts = Post.objects.filter(author=user).with_comments_count().order_by('-pub_date')
     else:
         posts = Post.objects.filter(
             author=user,
             is_published=True,
             pub_date__lte=timezone.now(),
             category__is_published=True
-        ).with_comments_count(
-            comment_count=Count('comments')
-        ).order_by('-pub_date')
+        ).with_comments_count().order_by('-pub_date')
 
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
